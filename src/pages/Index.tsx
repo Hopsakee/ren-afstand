@@ -1,11 +1,96 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Plus, RotateCcw } from "lucide-react";
+import "@fontsource/manrope/400.css";
+import "@fontsource/manrope/600.css";
+import "@fontsource/manrope/700.css";
+import "@fontsource/manrope/800.css";
+import { Segment, createSegment, calcTotalDistance } from "@/lib/workout";
+import SegmentCard from "@/components/SegmentCard";
 
 const Index = () => {
+  const [segments, setSegments] = useState<Segment[]>([createSegment()]);
+
+  const totalDistance = calcTotalDistance(segments);
+
+  const updateSegment = (idx: number, seg: Segment) => {
+    const next = [...segments];
+    next[idx] = seg;
+    setSegments(next);
+  };
+
+  const removeSegment = (idx: number) => {
+    setSegments(segments.filter((_, i) => i !== idx));
+  };
+
+  const addSegment = () => {
+    setSegments([...segments, createSegment()]);
+  };
+
+  const resetAll = () => {
+    setSegments([createSegment()]);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background pb-28">
+      {/* Header with total */}
+      <header className="sticky top-0 z-10 backdrop-blur-md bg-background/80 border-b border-border">
+        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-bold tracking-tight">Run Calculator</h1>
+            <p className="text-xs text-muted-foreground">Estimate workout distance</p>
+          </div>
+          <div className="text-right">
+            <motion.div
+              key={totalDistance.toFixed(2)}
+              initial={{ scale: 1.1 }}
+              animate={{ scale: 1 }}
+              className="text-3xl font-extrabold tabular-nums text-primary"
+            >
+              {totalDistance.toFixed(2)}
+            </motion.div>
+            <span className="text-xs text-muted-foreground">km total</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Segments */}
+      <main className="max-w-lg mx-auto px-4 py-6 space-y-4">
+        <AnimatePresence mode="popLayout">
+          {segments.map((seg, idx) => (
+            <SegmentCard
+              key={seg.id}
+              segment={seg}
+              onChange={(s) => updateSegment(idx, s)}
+              onRemove={() => removeSegment(idx)}
+            />
+          ))}
+        </AnimatePresence>
+
+        {segments.length === 0 && (
+          <p className="text-center text-muted-foreground py-12 text-sm">
+            No segments yet. Add one below.
+          </p>
+        )}
+      </main>
+
+      {/* Sticky bottom bar */}
+      <div className="fixed bottom-0 inset-x-0 z-10 border-t border-border bg-background/90 backdrop-blur-md">
+        <div className="max-w-lg mx-auto px-4 py-3 flex gap-3">
+          <button
+            onClick={addSegment}
+            className="flex-1 h-14 flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity active:scale-[0.98]"
+          >
+            <Plus size={18} /> Add Segment
+          </button>
+          <button
+            onClick={resetAll}
+            className="h-14 w-14 flex items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors active:scale-[0.98]"
+            aria-label="Reset all"
+          >
+            <RotateCcw size={18} />
+          </button>
+        </div>
       </div>
     </div>
   );

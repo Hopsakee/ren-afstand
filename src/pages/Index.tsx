@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, RotateCcw } from "lucide-react";
 import "@fontsource/manrope/400.css";
@@ -10,6 +10,7 @@ import SegmentCard from "@/components/SegmentCard";
 
 const Index = () => {
   const [segments, setSegments] = useState<Segment[]>([createSegment()]);
+  const [focusRequest, setFocusRequest] = useState<{ segmentId: string; target: "name" | "phaseDuration"; phaseId?: string } | null>(null);
 
   const totalDistance = calcTotalDistance(segments);
 
@@ -23,17 +24,22 @@ const Index = () => {
     setSegments(segments.filter((_, i) => i !== idx));
   };
 
-  const addSegment = () => {
-    setSegments([...segments, createSegment()]);
-  };
+  const addSegment = useCallback(() => {
+    const seg = createSegment();
+    setSegments((prev) => [...prev, seg]);
+    setFocusRequest({ segmentId: seg.id, target: "name" });
+  }, []);
 
   const resetAll = () => {
     setSegments([createSegment()]);
   };
 
+  const handleFocusConsumed = useCallback(() => {
+    setFocusRequest(null);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Header with total */}
       <header className="sticky top-0 z-10 backdrop-blur-md bg-background/80 border-b border-border">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
           <div>
@@ -54,7 +60,6 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Segments */}
       <main className="max-w-lg mx-auto px-4 py-6 space-y-4">
         <AnimatePresence mode="popLayout">
           {segments.map((seg, idx) => (
@@ -63,6 +68,9 @@ const Index = () => {
               segment={seg}
               onChange={(s) => updateSegment(idx, s)}
               onRemove={() => removeSegment(idx)}
+              onAddSegment={addSegment}
+              focusRequest={focusRequest?.segmentId === seg.id ? focusRequest : null}
+              onFocusConsumed={handleFocusConsumed}
             />
           ))}
         </AnimatePresence>
@@ -74,7 +82,6 @@ const Index = () => {
         )}
       </main>
 
-      {/* Sticky bottom bar */}
       <div className="fixed bottom-0 inset-x-0 z-10 border-t border-border bg-background/90 backdrop-blur-md">
         <div className="max-w-lg mx-auto px-4 py-3 flex gap-3">
           <button

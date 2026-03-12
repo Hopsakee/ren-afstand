@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Phase } from "@/lib/workout";
 import { X } from "lucide-react";
 
@@ -7,6 +8,8 @@ interface Props {
   showRemove: boolean;
   onChange: (phase: Phase) => void;
   onRemove: () => void;
+  shouldFocusDuration?: boolean;
+  onFocusConsumed?: () => void;
 }
 
 function PaceField({
@@ -50,14 +53,25 @@ function PaceField({
   );
 }
 
-export default function PhaseInput({ phase, index, showRemove, onChange, onRemove }: Props) {
+export default function PhaseInput({ phase, index, showRemove, onChange, onRemove, shouldFocusDuration, onFocusConsumed }: Props) {
   const update = (patch: Partial<Phase>) => onChange({ ...phase, ...patch });
+  const durationMinRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (shouldFocusDuration) {
+      requestAnimationFrame(() => {
+        durationMinRef.current?.focus();
+        onFocusConsumed?.();
+      });
+    }
+  }, [shouldFocusDuration, onFocusConsumed]);
 
   return (
     <div className="flex flex-wrap items-end gap-3 p-3 rounded-lg bg-muted/50 relative">
       {showRemove && (
         <button
           onClick={onRemove}
+          tabIndex={-1}
           className="absolute top-2 right-2 p-1 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
           aria-label="Remove phase"
         >
@@ -71,6 +85,7 @@ export default function PhaseInput({ phase, index, showRemove, onChange, onRemov
         </span>
         <div className="flex items-center gap-1">
           <input
+            ref={durationMinRef}
             type="number"
             min="0"
             placeholder="min"

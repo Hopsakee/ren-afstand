@@ -61,7 +61,18 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-6 space-y-4">
+      <div className="max-w-lg mx-auto px-4 pt-3 pb-1 flex items-center gap-2 text-[11px] text-muted-foreground">
+        <Keyboard size={13} className="shrink-0" />
+        <span>
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] font-mono">Enter</kbd> new segment
+          <span className="mx-1.5">·</span>
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] font-mono">Alt+Enter</kbd> new phase
+          <span className="mx-1.5">·</span>
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] font-mono">Ctrl+D</kbd> delete segment
+        </span>
+      </div>
+
+      <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         <AnimatePresence mode="popLayout">
           {segments.map((seg, idx) => (
             <SegmentCard

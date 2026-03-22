@@ -1,4 +1,6 @@
-# Welcome to your Lovable project
+# Run Distance Calculator
+
+A lightweight web tool that estimates the total distance of a structured running workout. You enter each segment of your training session — warm-up, intervals, cool-down — with its duration and pace range, and the app instantly calculates how far you'll run. Built for runners who follow coached workouts (e.g. from Garmin, Nike Run Club) and want a quick distance estimate before heading out.
 
 ## Project info
 

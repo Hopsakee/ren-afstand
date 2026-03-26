@@ -48,16 +48,29 @@ const Index = () => {
             <h1 className="text-lg font-bold tracking-tight">Run Calculator</h1>
             <p className="text-xs text-muted-foreground">Estimate workout distance & time</p>
           </div>
-          <div className="text-right">
-            <motion.div
-              key={totalDistance.toFixed(2)}
-              initial={{ scale: 1.1 }}
-              animate={{ scale: 1 }}
-              className="text-3xl font-extrabold tabular-nums text-primary"
-            >
-              {totalDistance.toFixed(2)}
-            </motion.div>
-            <span className="text-xs text-muted-foreground">km total</span>
+          <div className="text-right flex items-center gap-4">
+            <div>
+              <motion.div
+                key={formatDurationFromSec(totalDuration)}
+                initial={{ scale: 1.1 }}
+                animate={{ scale: 1 }}
+                className="text-2xl font-extrabold tabular-nums text-foreground"
+              >
+                {formatDurationFromSec(totalDuration)}
+              </motion.div>
+              <span className="text-xs text-muted-foreground">time</span>
+            </div>
+            <div>
+              <motion.div
+                key={totalDistance.toFixed(2)}
+                initial={{ scale: 1.1 }}
+                animate={{ scale: 1 }}
+                className="text-3xl font-extrabold tabular-nums text-primary"
+              >
+                {totalDistance.toFixed(2)}
+              </motion.div>
+              <span className="text-xs text-muted-foreground">km total</span>
+            </div>
           </div>
         </div>
       </header>

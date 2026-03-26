@@ -46,7 +46,7 @@ const Index = () => {
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold tracking-tight">Run Calculator</h1>
-            <p className="text-xs text-muted-foreground">Estimate workout distance</p>
+            <p className="text-xs text-muted-foreground">Estimate workout distance & time</p>
           </div>
           <div className="text-right">
             <motion.div

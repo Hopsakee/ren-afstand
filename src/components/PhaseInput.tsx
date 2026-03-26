@@ -185,6 +185,7 @@ export default function PhaseInput({ phase, index, showRemove, onChange, onRemov
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

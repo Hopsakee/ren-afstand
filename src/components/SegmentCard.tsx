@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Plus, Trash2 } from "lucide-react";
-import { Segment, createPhase, calcSegmentDistance } from "@/lib/workout";
+import { Segment, createPhase, calcSegmentDistance, togglePhaseMode } from "@/lib/workout";
 import PhaseInput from "./PhaseInput";
 
 interface Props {

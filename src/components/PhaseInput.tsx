@@ -81,7 +81,7 @@ export default function PhaseInput({ phase, index, showRemove, onChange, onRemov
     : calcPhaseDuration(phase);
 
   return (
-    <div className="flex flex-wrap items-end gap-3 p-3 rounded-lg bg-muted/50 relative">
+    <div data-phase-id={phase.id} className="flex flex-wrap items-end gap-3 p-3 rounded-lg bg-muted/50 relative">
       {showRemove && (
         <button
           onClick={onRemove}

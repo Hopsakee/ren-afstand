@@ -14,6 +14,7 @@ const Index = () => {
   const [focusRequest, setFocusRequest] = useState<{ segmentId: string; target: "name" | "phaseDuration"; phaseId?: string } | null>(null);
 
   const totalDistance = calcTotalDistance(segments);
+  const totalDuration = calcTotalDuration(segments);
 
   const updateSegment = (idx: number, seg: Segment) => {
     const next = [...segments];

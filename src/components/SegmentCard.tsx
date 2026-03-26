@@ -65,6 +65,10 @@ export default function SegmentCard({ segment, onChange, onRemove, onAddSegment,
       e.preventDefault();
       onRemove();
     }
+    if (e.key === "m" && e.altKey) {
+      e.preventDefault();
+      onChange({ ...segment, phases: segment.phases.map(p => togglePhaseMode(p)) });
+    }
   };
 
   return (

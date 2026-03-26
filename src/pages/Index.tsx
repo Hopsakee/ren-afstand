@@ -68,8 +68,10 @@ const Index = () => {
           <span className="mx-1.5">·</span>
           <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] font-mono">Alt+Enter</kbd> new phase
           <span className="mx-1.5">·</span>
-          <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] font-mono">Ctrl+D</kbd> delete segment
-        </span>
+         <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] font-mono">Ctrl+D</kbd> delete segment
+          <span className="mx-1.5">·</span>
+          <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] font-mono">Alt+M</kbd> toggle time/distance
+         </span>
       </div>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">

@@ -67,7 +67,18 @@ export default function SegmentCard({ segment, onChange, onRemove, onAddSegment,
     }
     if (e.key === "m" && e.altKey) {
       e.preventDefault();
-      onChange({ ...segment, phases: segment.phases.map(p => togglePhaseMode(p)) });
+      // Find which phase's input is focused
+      const active = document.activeElement;
+      const phaseEls = (e.currentTarget as HTMLElement).querySelectorAll('[data-phase-id]');
+      let targetPhaseId: string | null = null;
+      phaseEls.forEach(el => {
+        if (el.contains(active)) {
+          targetPhaseId = el.getAttribute('data-phase-id');
+        }
+      });
+      if (targetPhaseId) {
+        onChange({ ...segment, phases: segment.phases.map(p => p.id === targetPhaseId ? togglePhaseMode(p) : p) });
+      }
     }
   };
 

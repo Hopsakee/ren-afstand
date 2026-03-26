@@ -6,7 +6,7 @@ import "@fontsource/manrope/400.css";
 import "@fontsource/manrope/600.css";
 import "@fontsource/manrope/700.css";
 import "@fontsource/manrope/800.css";
-import { Segment, createSegment, calcTotalDistance } from "@/lib/workout";
+import { Segment, createSegment, calcTotalDistance, calcTotalDuration, formatDurationFromSec } from "@/lib/workout";
 import SegmentCard from "@/components/SegmentCard";
 
 const Index = () => {

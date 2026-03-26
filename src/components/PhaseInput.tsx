@@ -81,28 +81,30 @@ export default function PhaseInput({ phase, index, showRemove, onChange, onRemov
     : calcPhaseDuration(phase);
 
   return (
-    <div data-phase-id={phase.id} className="flex flex-wrap items-end gap-3 p-3 rounded-lg bg-muted/50 relative">
-      {showRemove && (
+    <div data-phase-id={phase.id} className="rounded-lg bg-muted/50 p-3 space-y-2">
+      <div className="flex items-center justify-end gap-1">
         <button
-          onClick={onRemove}
+          onClick={handleToggleMode}
           tabIndex={-1}
-          className="absolute top-2 right-2 p-1 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-          aria-label="Remove phase"
+          className="p-1 rounded-full hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Toggle calculation mode"
+          title={phase.mode === "time" ? "Switch to: know distance, calc time" : "Switch to: know time, calc distance"}
         >
-          <X size={14} />
+          <ArrowLeftRight size={14} />
         </button>
-      )}
+        {showRemove && (
+          <button
+            onClick={onRemove}
+            tabIndex={-1}
+            className="p-1 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+            aria-label="Remove phase"
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
 
-      {/* Mode toggle button */}
-      <button
-        onClick={handleToggleMode}
-        tabIndex={-1}
-        className="absolute top-2 right-8 p-1 rounded-full hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
-        aria-label="Toggle calculation mode"
-        title={phase.mode === "time" ? "Switch to: know distance, calc time" : "Switch to: know time, calc distance"}
-      >
-        <ArrowLeftRight size={14} />
-      </button>
+      <div className="flex flex-wrap items-end gap-3">
 
       {phase.mode === "time" ? (
         <div className="flex flex-col gap-1">
@@ -183,6 +185,7 @@ export default function PhaseInput({ phase, index, showRemove, onChange, onRemov
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -2,19 +2,28 @@
 	root * /srv/app
 	encode gzip zstd
 
-	# This app has no PWA/service-worker and ships no .wasm file (confirmed by
-	# grep/find during the port — see CLAUDE.md). The @wasm block and the
-	# sw.js/manifest.webmanifest entries in @nocache below are therefore
-	# defensive/dead code here: kept only for consistency with the shared
-	# Caddyfile template every ported Lovable app uses, in case a future
-	# version of this app adds either.
+	# This app ships no .wasm file (confirmed by find during the port — see
+	# CLAUDE.md). The @wasm block is defensive/dead code, kept only for
+	# consistency with the shared Caddyfile template, in case a future
+	# version of this app adds one.
 	@wasm path *.wasm
 	header @wasm Content-Type "application/wasm"
 
+	# PWA (vite-plugin-pwa, registerType: autoUpdate, added after the initial
+	# port). sw.js/manifest.webmanifest/registerSW.js/`/` must never be
+	# browser-cached, or a returning visitor's service worker won't notice a
+	# new deploy exists — verified end-to-end with curl (see CLAUDE.md).
 	@nocache path / /index.html /sw.js /manifest.webmanifest /registerSW.js
 	header @nocache Cache-Control "no-cache"
 
-	@immutable path /assets/*
+	# Vite's hashed /assets/* AND vite-plugin-pwa's own hashed workbox
+	# runtime chunk (workbox-<hash>.js, lives at the repo root, not under
+	# /assets/) are both safe to cache for a year — both filenames change
+	# whenever their content does. Found by curling the real built output:
+	# without the /workbox-*.js pattern here, that file got no Cache-Control
+	# header at all (fell through both matchers), unlike every other hashed
+	# asset.
+	@immutable path /assets/* /workbox-*.js
 	header @immutable Cache-Control "public, max-age=31536000, immutable"
 
 	# Caddy's `path` matcher operates on the request path as given, while

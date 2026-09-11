@@ -31,28 +31,48 @@ it's a real feature to add, not something silently already there.
 
 ## Confirmed trap status (checked, not assumed)
 
-Two of `lovable-porting/PORTING-PLAYBOOK.md`'s "Known traps" were marked
-ASSUMED because the findjd/hopsakee-decimal-finder pilot never exercised
-them. This port actually checked both, plus the PWA claim from
-MIGRATION-PLAN.md:
-
 - **`VITE_*` build-arg trap**: `grep -rn "import.meta.env" src/` and
   `grep -rl "VITE_" .` (excluding node_modules/dist/.git) both return no
   matches. This app uses zero `VITE_*` environment variables, so the
-  Docker Compose `build.args` vs `environment:` distinction the playbook
-  warns about is **not exercised** by this app either — still unproven,
-  same as the pilot.
+  Docker Compose `build.args` vs `environment:` distinction
+  `lovable-porting/PORTING-PLAYBOOK.md` warns about is **not exercised** by
+  this app.
 - **`.wasm` Content-Type trap**: `find . -iname '*.wasm' -not -path
   './node_modules/*'` returns nothing. This app ships no `.wasm` file, so
   the `@wasm` block in this repo's `Caddyfile` is **defensive/dead code**,
   kept only so the Caddyfile matches the shared template used by every
   ported Lovable app — not because this app needs it.
-- **PWA / service worker**: `grep -rli "serviceworker\|vite-plugin-pwa\|registerSW"`
-  across the repo (excluding node_modules/.git) returns no matches. This
-  app has no service worker and no manifest, confirming MIGRATION-PLAN.md's
-  claim for real. The `sw.js`/`manifest.webmanifest`/`registerSW.js`
-  entries in the Caddyfile's `@nocache` matcher are likewise defensive/dead
-  code kept for template consistency, not because this app has a PWA.
+
+## PWA support (added after the initial port)
+
+Added `vite-plugin-pwa` (`registerType: "autoUpdate"`, `generateSW` mode),
+mirroring the exact config already verified in `findjd`/
+`hopsakee-decimal-finder`: manifest (`name`/`short_name`/`description` taken
+from this app's own `index.html`; `theme_color`/`background_color` from
+`src/index.css`'s `--accent`/`--background` tokens), `apple-touch-icon` +
+`theme-color` meta added to `index.html`, two placeholder icons generated
+in `public/` (`pwa-192x192.png`, `pwa-512x512.png` — a plain rounded square
+in the app's accent color with an "R" monogram; **swap these for real
+branding**, they're functional placeholders, not a design decision).
+
+Verified for real, not assumed, via a full Docker build → run → curl round
+trip:
+- `npm run build` produces `dist/sw.js`, `dist/workbox-<hash>.js`,
+  `dist/registerSW.js`, `dist/manifest.webmanifest`.
+- `/`, `/index.html`, `/sw.js`, `/manifest.webmanifest`, `/registerSW.js` →
+  `Cache-Control: no-cache` (so a returning visitor's browser always
+  revalidates and the service worker picks up a new deploy).
+- `/assets/*` → 1-year immutable, as before.
+- **New finding this round**: vite-plugin-pwa's own runtime chunk
+  (`workbox-<hash>.js`) lives at the repo root, not under `/assets/`, so it
+  fell through both `Caddyfile` matchers and got **no** `Cache-Control`
+  header at all until `/workbox-*.js` was added to the `@immutable`
+  matcher explicitly — its filename is content-hashed exactly like
+  `/assets/*`, so 1-year-immutable is correct and safe for it too. Confirmed
+  with `curl -I` before and after the fix.
+- `<link rel="manifest">` and `<meta name="theme-color">` both present in
+  the served `index.html`; `manifest.webmanifest` serves with
+  `Content-Type: application/manifest+json`.
 
 ## Build
 
@@ -76,10 +96,12 @@ under `npm ci` — a known sandbox-only issue, not a real bug); `bun.lock` and
 ## Caddy serving/caching behaviour
 
 See `Caddyfile`. `:8080`, gzip+zstd, SPA fallback (`try_files {path}
-/index.html`), `no-cache` on `/`, `/index.html` (and the dead
-`sw.js`/manifest entries above), `public, max-age=31536000, immutable` on
-everything under `/assets/*` (Vite's content-hashed filenames make that
-safe), and a plain-text `handle_errors` block. The `path`-matcher-before-
+/index.html`), `no-cache` on `/`, `/index.html`, `/sw.js`,
+`/manifest.webmanifest`, `/registerSW.js` (now live — see PWA section
+above), `public, max-age=31536000, immutable` on everything under
+`/assets/*` and on `/workbox-*.js` (Vite's and vite-plugin-pwa's
+content-hashed filenames make that safe), and a plain-text `handle_errors`
+block. The `path`-matcher-before-
 `try_files` ordering matters: matchers see the literal request path, while
 `try_files` resolves against the filesystem including the SPA rewrite, so
 the header matchers have to run first or every request would get rewritten

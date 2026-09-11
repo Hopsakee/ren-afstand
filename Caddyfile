@@ -1,0 +1,30 @@
+:8080 {
+	root * /srv/app
+	encode gzip zstd
+
+	# This app has no PWA/service-worker and ships no .wasm file (confirmed by
+	# grep/find during the port — see CLAUDE.md). The @wasm block and the
+	# sw.js/manifest.webmanifest entries in @nocache below are therefore
+	# defensive/dead code here: kept only for consistency with the shared
+	# Caddyfile template every ported Lovable app uses, in case a future
+	# version of this app adds either.
+	@wasm path *.wasm
+	header @wasm Content-Type "application/wasm"
+
+	@nocache path / /index.html /sw.js /manifest.webmanifest /registerSW.js
+	header @nocache Cache-Control "no-cache"
+
+	@immutable path /assets/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	# Caddy's `path` matcher operates on the request path as given, while
+	# `try_files` resolves against the filesystem including the SPA fallback —
+	# matching {path} first is required for the two header blocks above to
+	# actually apply before the fallback rewrites everything to /index.html.
+	try_files {path} /index.html
+	file_server
+
+	handle_errors {
+		respond "{err.status_code} {err.status_text}" {err.status_code}
+	}
+}

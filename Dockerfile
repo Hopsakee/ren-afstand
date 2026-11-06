@@ -14,3 +14,4 @@ RUN npm run build
 FROM node-static-base:20
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY --from=build --chown=appuser:appuser /app/dist /srv/app
+USER appuser

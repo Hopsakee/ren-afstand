@@ -78,7 +78,7 @@ trip:
 
 Two-stage Docker build (see `Dockerfile`):
 
-1. `node:22-slim` stage: `npm ci` against the committed `package-lock.json`,
+1. `node:24-slim` stage: `npm ci` against the committed `package-lock.json`,
    then `npm run build` (plain `vite build` — no env vars baked in, see
    above). Output is a static `dist/` (hashed asset filenames under
    `dist/assets/`).
